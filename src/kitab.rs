@@ -1,4 +1,7 @@
 use std::{io, fs};
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
 
 pub struct Kitab{
    pub ad: String,
@@ -24,31 +27,17 @@ pub fn setirden_kitab(setir: &str) ->Result<Kitab, String>{
         il,
     })
 }
-pub fn fayildan_oxu() ->Vec<Kitab>{
+pub fn fayldan_oxu() ->Option<Vec<Kitab>> {
+    let metn = std::fs::read_to_string("kitablar.json").ok()?;
 
-    let mut kitablar: Vec<Kitab> = Vec::new();
-
-    match fs::read_to_string("kitablar.txt"){
-        Ok(metn) =>{
-            for setir in metn.lines(){
-                match setirden_kitab(setir){
-                    Ok(k) => kitablar.push(k),
-                    Err(e) => println!("Xeta: {e} -> {setir}"),
-                }
-            }
-        }
-        Err(_) =>println!("Fayl tapimadi, bos siyahi ile baslayiriq"),
-    }
-    kitablar
+    serde_json::from_str(&metn).ok()
 }
-pub fn fayla_yaz(kitablar: &[Kitab]) ->Result<(), std::io::Error>{
+pub fn fayla_yaz(kitablar: &Vec<Kitab>) ->Result<(), String> {
+    let metn = serde_json::to_string_pretty(kitablar).map_err(|e| e.to_string())?;
 
-    let mut metn = String::new();
+    std::fs::write("kitablar.json", metn).map_err(|e| e.to_string())?;
 
-    for k in kitablar{
-        metn.push_str(&format!("{}, {}, {}\n", k.ad, k.muellif, k.il));
-    }
-    fs::write("kitablar.txt", metn)
+    Ok(())
 }
 pub fn oxu(izah: &str) ->String{
 

@@ -1,7 +1,7 @@
 mod kitab;
 
 use std::{fs, io};
-use kitab::{Kitab, fayildan_oxu, fayla_yaz, setirden_kitab, oxu, tap};
+use kitab::{Kitab, fayldan_oxu, fayla_yaz, setirden_kitab, oxu, tap};
 enum Secim{
     Siyahi,
     Elave,
@@ -25,10 +25,10 @@ fn secimi_oxu(metn: &str) ->Option<Secim>{
 }
 
 fn main() {
-
-    let mut kitablar: Vec<Kitab> = fayildan_oxu();
-
-    
+    let mut kitablar:Vec<Kitab> = match fayldan_oxu() {
+        Some(k) => k,
+        None => Vec::new(),
+    };
 
     loop{
         println!("\n1 - Kitablarin siyahisi.");
